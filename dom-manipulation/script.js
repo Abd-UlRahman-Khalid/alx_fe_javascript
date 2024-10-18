@@ -23,6 +23,32 @@ function showRandomQuote() {
   container.innerHTML = `'${quoteArray[randomNum].text}' '${quoteArray[randomNum].category}'`;
 }
 
+// Creating Form By JS
+function createAddQuoteForm() {
+  let container = document.createElement("div");
+  container.id = "quoteForm";
+
+  let inputText = document.createElement("input");
+  inputText.id = "newQuoteText";
+  inputText.type = "text";
+  inputText.placeholder = "Enter a new quote";
+
+  let inputCategory = document.createElement("input");
+  inputCategory.id = "newQuoteCategory";
+  inputCategory.type = "text";
+  inputCategory.placeholder = "Enter quote category";
+
+  let addQBtn = document.createElement("button");
+  addQBtn.id = "addQuoteButton";
+  addQBtn.textContent = "Add Quote";
+
+  container.appendChild(inputText);
+  container.appendChild(inputCategory);
+  container.appendChild(addQBtn);
+  document.body.appendChild(container);
+
+  addQBtn.addEventListener("click", addQuote);
+}
 // Function to add a Quote to the array
 function addQuote() {
   let inQuote = document.getElementById("newQuoteText").value;
@@ -37,8 +63,8 @@ function addQuote() {
     alert("You Must Fill Both Quote & Category Fields");
   }
 }
+onload = function () {
+  createAddQuoteForm();
+};
 // applying the function
 btn.addEventListener("click", showRandomQuote);
-
-let addBtn = document.getElementById("addQuoteButton");
-addBtn.addEventListener("click", addQuote);
