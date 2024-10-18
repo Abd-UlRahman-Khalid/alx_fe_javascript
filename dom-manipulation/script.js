@@ -207,7 +207,7 @@ async function syncQuotesWithServer() {
 
     // Save merged quotes to local storage
     localStorage.setItem("quotes", JSON.stringify(mergedQuotes));
-    console.log("Local and server quotes synced successfully.");
+    console.log("Quotes synced with server!");
   } catch (error) {
     console.error("Error during syncing quotes with the server:", error);
   }
