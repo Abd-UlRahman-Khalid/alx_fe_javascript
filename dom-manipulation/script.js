@@ -95,8 +95,8 @@ function exportToJsonFile() {
 }
 
 // Add an export button in the form
-const exportBtn = document.createElement("button");
-exportBtn.textContent = "Export Quotes";
+const exportBtn = document.getElementById("expBTN");
+
 exportBtn.addEventListener("click", exportToJsonFile);
 document.body.appendChild(exportBtn);
 
