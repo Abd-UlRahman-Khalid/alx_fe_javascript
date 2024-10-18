@@ -122,12 +122,9 @@ function importFromJsonFile(event) {
 }
 
 // Add file input for importing JSON
-const importInput = document.createElement("input");
-importInput.type = "file";
-importInput.accept = ".json";
-importInput.id = "importFile";
+const importInput = document.getElementById("importFile");
+
 importInput.onchange = importFromJsonFile;
-document.body.appendChild(importInput);
 
 onload = function () {
   LoadQouts();
