@@ -175,39 +175,28 @@ function loadLastFilter() {
     filterQuotes(); // Apply the last selected filter
   }
 }
-
-// Simulate fetching quotes from a server
-function fetchQuotesFromServer() {
-  return fetch("https://jsonplaceholder.typicode.com/posts") // Simulated endpoint
-    .then((response) => response.json())
-    .then((serverQuotes) => {
-      // Use or merge with local quotes
-      console.log("Fetched server quotes:", serverQuotes);
-      return serverQuotes;
-    })
-    .catch((error) => console.error("Error fetching server quotes:", error));
+// Simulate fetching quotes from a server using async/await
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts"); // Simulated server endpoint
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const serverQuotes = await response.json(); // Parse JSON response
+    console.log("Fetched server quotes:", serverQuotes);
+    return serverQuotes;
+  } catch (error) {
+    console.error("Error fetching server quotes:", error);
+  }
 }
 
-setInterval(() => {
-  fetchQuotesFromServer();
-}, 10000); // Fetch new data every 10 seconds
-
-function postQuoteToServer(quote) {
-  return fetch("https://jsonplaceholder.typicode.com/posts", {
-    method: "POST",
-    body: JSON.stringify(quote),
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((response) => response.json())
-    .then((data) => console.log("Quote successfully posted:", data))
-    .catch((error) => console.error("Error posting quote:", error));
-}
-
-function syncQuotesWithServer() {
-  fetchQuotesFromServer().then((serverQuotes) => {
+// Function to sync local quotes with server quotes using async/await
+async function syncQuotesWithServer() {
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
     let localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
 
-    // Merge server quotes with local ones (without duplicates)
+    // Merge server quotes with local ones (no duplicates)
     const mergedQuotes = [
       ...localQuotes,
       ...serverQuotes.filter(
@@ -218,48 +207,78 @@ function syncQuotesWithServer() {
 
     // Save merged quotes to local storage
     localStorage.setItem("quotes", JSON.stringify(mergedQuotes));
-  });
+    console.log("Local and server quotes synced successfully.");
+  } catch (error) {
+    console.error("Error during syncing quotes with the server:", error);
+  }
 }
 
-// Call sync function periodically
+// Call sync function periodically to simulate real-time updates
 setInterval(() => {
   syncQuotesWithServer();
 }, 15000); // Sync every 15 seconds
 
-function resolveConflicts(serverQuotes) {
-  let localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+// Resolve conflicts between server and local quotes
+async function resolveConflicts() {
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
+    let localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
 
-  const updatedLocalQuotes = localQuotes.map((localQuote) => {
-    const serverMatch = serverQuotes.find(
-      (serverQuote) => serverQuote.id === localQuote.id
-    );
+    const updatedLocalQuotes = localQuotes.map((localQuote) => {
+      const serverMatch = serverQuotes.find(
+        (serverQuote) => serverQuote.id === localQuote.id
+      );
+      return serverMatch ? serverMatch : localQuote; // Use server version if there's a conflict
+    });
 
-    // If a matching server quote is found, use the server version (conflict resolution)
-    return serverMatch ? serverMatch : localQuote;
-  });
-
-  // Save the updated local storage after resolving conflicts
-  localStorage.setItem("quotes", JSON.stringify(updatedLocalQuotes));
+    // Save updated local storage after resolving conflicts
+    localStorage.setItem("quotes", JSON.stringify(updatedLocalQuotes));
+    console.log("Conflicts resolved and local storage updated.");
+  } catch (error) {
+    console.error("Error during conflict resolution:", error);
+  }
 }
 
-// Integrate this within the syncing logic
-function syncQuotesWithServer() {
-  fetchQuotesFromServer().then((serverQuotes) => {
-    resolveConflicts(serverQuotes);
+// Simulate posting a quote to the server using async/await
+async function postQuoteToServer(quote) {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      body: JSON.stringify(quote),
+      headers: { "Content-Type": "application/json" },
+    });
 
-    // Optionally: Inform the user about the conflict resolution
-    alert("Local data was synced with the server. Conflicts were resolved.");
-  });
+    if (!response.ok) {
+      throw new Error("Error posting quote to the server");
+    }
+
+    const data = await response.json();
+    console.log("Quote successfully posted:", data);
+    return data;
+  } catch (error) {
+    console.error("Error posting quote:", error);
+  }
 }
 
-function notifyUserOfConflict(conflictDetails) {
-  // Display a notification to the user and give them options to resolve the conflict manually
-  console.log("Conflict detected:", conflictDetails);
-  alert(`Conflict detected for quote: "${conflictDetails.local.text}".\n
-    Local version: "${conflictDetails.local.text}"\n
-    Server version: "${conflictDetails.server.text}".`);
+// Example: Adding a new quote and syncing with the server
+async function addQuoteAndSync(quote) {
+  try {
+    await postQuoteToServer(quote);
+    await syncQuotesWithServer();
+    console.log("Quote added and data synced successfully.");
+  } catch (error) {
+    console.error("Error adding quote and syncing data:", error);
+  }
+}
 
-  // You can then offer a UI for the user to choose which version to keep
+// Sync and resolve conflicts, then notify the user
+async function syncAndResolveConflictsWithNotification() {
+  try {
+    await resolveConflicts(); // Resolve conflicts first
+    alert("Data was synced and conflicts were resolved with server data.");
+  } catch (error) {
+    console.error("Error syncing and resolving conflicts:", error);
+  }
 }
 
 onload = function () {
