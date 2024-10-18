@@ -146,13 +146,13 @@ function populateCategories() {
 
 // Function to filter quotes by category and display them
 function filterQuotes() {
-  const selecteCategory = document.getElementById("categoryFilter").value;
+  const selectedCategory = document.getElementById("categoryFilter").value;
   const quoteDisplay = document.getElementById("quoteDisplay");
   // Filter quotes based on the selected category
   const filteredQuotes =
-    selecteCategory === "all"
+    selectedCategory === "all"
       ? quoteArray
-      : quoteArray.filter((quote) => quote.category === selecteCategory);
+      : quoteArray.filter((quote) => quote.category === selectedCategory);
 
   if (filteredQuotes.length > 0) {
     const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
@@ -160,7 +160,7 @@ function filterQuotes() {
     quoteDisplay.innerHTML = `"${randomQuote.text}" - ${randomQuote.category}`;
 
     // Save last selected category filter and last displayed quote
-    localStorage.setItem("lastFilter", selecteCategory);
+    localStorage.setItem("lastFilter", selectedCategory);
     sessionStorage.setItem("lastQuote", JSON.stringify(randomQuote));
   } else {
     quoteDisplay.innerHTML = "No quotes available for this category.";
