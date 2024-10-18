@@ -71,6 +71,8 @@ function addQuote() {
 
     // call saveQoutes Function to save the new qoute in localStorage
     saveQuotes();
+    populateCategories();
+
     inQuote = "";
     inCategory = "";
     alert("You Successfully add New Qoute");
@@ -126,8 +128,58 @@ const importInput = document.getElementById("importFile");
 
 importInput.onchange = importFromJsonFile;
 
+// Populate the category filter dropdown with unique categories
+function populateCategories() {
+  let categoryFilter = document.getElementById("categoryFilter");
+  // creat new array with the categories items from the quoteArray and put it in
+  const uniqueCategories = [
+    ...new Set(quoteArray.map((quote) => quote.category)),
+  ];
+
+  uniqueCategories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+}
+
+// Function to filter quotes by category and display them
+function filterQuotes() {
+  const selecteCategory = document.getElementById("categoryFilter").value;
+  const quoteDisplay = document.getElementById("quoteDisplay");
+  // Filter quotes based on the selected category
+  const filteredQuotes =
+    selecteCategory === "all"
+      ? quoteArray
+      : quoteArray.filter((quote) => quote.category === selecteCategory);
+
+  if (filteredQuotes.length > 0) {
+    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+    const randomQuote = filteredQuotes[randomIndex];
+    quoteDisplay.innerHTML = `"${randomQuote.text}" - ${randomQuote.category}`;
+
+    // Save last selected category filter and last displayed quote
+    localStorage.setItem("lastFilter", selecteCategory);
+    sessionStorage.setItem("lastQuote", JSON.stringify(randomQuote));
+  } else {
+    quoteDisplay.innerHTML = "No quotes available for this category.";
+  }
+}
+
+// Load last selected category filter from local storage
+function loadLastFilter() {
+  const lastFilter = localStorage.getItem("lastFilter");
+  if (lastFilter) {
+    document.getElementById("categoryFilter").value = lastFilter;
+    filterQuotes(); // Apply the last selected filter
+  }
+}
+
 onload = function () {
   LoadQouts();
+  populateCategories();
+  loadLastFilter();
   createAddQuoteForm();
 };
 // applying the function
